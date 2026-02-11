@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const registerValidation = require('../validation').registerValidation;
 const loginValidation = require('../validation').loginValidation;
-const { User } = require('../models');
+const { User } = require('../models');//这么写回去index里自动找user-model.js
 
 router.use((req, res, next) => {
     console.log('正在接收一个跟auth相关的请求');

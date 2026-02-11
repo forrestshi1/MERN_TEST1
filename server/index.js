@@ -19,7 +19,7 @@ mongoose
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/user", authRoute);
+app.use("/api/user", authRoute);//把 authRoute 这个路由挂载到 /api/user 这个路径前缀下。
 
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
