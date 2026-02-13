@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const registerValidation = require('../validation').registerValidation;
 const loginValidation = require('../validation').loginValidation;
+const { use } = require('passport');
 const { User } = require('../models');//这么写回去index里自动找user-model.js
+const jwt = require('jsonwebtoken');
 
 router.use((req, res, next) => {
     console.log('正在接收一个跟auth相关的请求');
@@ -42,4 +44,28 @@ router.post('/register', async (req, res) => {
     }
 })
 
+router.post('/login', async (req, res) => {
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const foundUser = await User.findOne({ email: req.body.email });//User 是 Mongoose 模型，findOne 查询数据库后返回匹配的那条用户记录，赋值给 foundUser。
+    if (!foundUser) {
+        return res.status(401).send('Email not found');
+    }
+
+    // 直接 await，不再用回调
+    const isMatch = await foundUser.comparePassword(req.body.password);
+
+    if (isMatch) {
+        const tokenObject = { _id: foundUser._id, email: foundUser.email };
+        const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, { expiresIn: '7d' });
+        return res.send({
+            msg: "登录成功",
+            token: "JWT " + token,
+            user: foundUser,
+        });
+    } else {
+        return res.status(401).send('Password incorrect');
+    }
+});
 module.exports = router;
