@@ -1,5 +1,6 @@
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+
 import Layout from "./components/Layout";
 import HomeComponent from "./components/home-component";
 import RegisterComponent from "./components/register-component";
@@ -9,7 +10,6 @@ import AuthService from "./services/auth.service";
 import CourseComponent from "./components/course-component";
 import PostCourseComponent from "./components/postCourse-component";
 import EnrollComponent from "./components/enroll-component";
-
 function App() {
   let [currentUser, setCurrentUser] = useState(AuthService.getCurrentUser());
   return (
