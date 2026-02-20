@@ -1,0 +1,100 @@
+/* HomeComponent.css - 主页组件的样式文件 */
+
+/* Hero 区域样式 */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3rem;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section .container-fluid {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  opacity: 0.95;
+  margin-bottom: 1.5rem;
+}
+
+/* 功能卡片样式 */
+.feature-card {
+  padding: 2.5rem;
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.student-card {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  border: none;
+}
+
+.instructor-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 技术栈区域 */
+.tech-stack {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.tech-item {
+  padding: 1rem;
+  text-align: center;
+}
+
+.tech-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 按钮样式 */
+.cta-button {
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
+  
+  .feature-card {
+    margin-bottom: 1rem;
+  }
+}

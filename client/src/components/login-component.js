@@ -52,7 +52,7 @@ const LoginComponent = ({ currentUser, setCurrentUser }) => {
         </div>
         <br />
         <div className="form-group">
-          <button onClick={handleLogin} className="btn btn-primary btn-block">
+          <button onClick={handleLogin} className="btn btn-primary btn-block">//用户点击后执行 handleLogin 登录函数。
             <span>登入系統</span>
           </button>
         </div>
