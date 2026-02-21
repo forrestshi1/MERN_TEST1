@@ -3,7 +3,7 @@ const API_URL = "http://localhost:8080/api/user";
 
 class AuthService {
   login(email, password) {
-    return axios.post(API_URL + "/login", { email, password });
+    return axios.post(API_URL + "/login", { email, password });//向 /api/user/login 发 POST 请求，把邮箱和密码发给后端，后端验证后返回 Token。
   }
   logout() {
     localStorage.removeItem("user");

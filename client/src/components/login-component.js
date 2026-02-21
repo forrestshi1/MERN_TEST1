@@ -18,7 +18,7 @@ const LoginComponent = ({ currentUser, setCurrentUser }) => {
   const handleLogin = async () => {
     try {
       let response = await AuthService.login(email, password);
-      localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("user", JSON.stringify(response.data));//把后端返回的 Token 存到 localStorage 里。
       window.alert("登入成功。您現在將被重新導向到個人資料頁面。");
       setCurrentUser(AuthService.getCurrentUser());
       nagivate("/profile");
