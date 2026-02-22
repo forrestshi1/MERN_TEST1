@@ -29,6 +29,7 @@ app.use("/api/user", authRoute);//把 authRoute 这个路由挂载到 /api/user 
 //course route应该被jwt保护，如果request中没有包含jwt token，就返回错误
 app.use("/api/courses", passport.authenticate('jwt', { session: false }), courseRoute);
 
-app.listen(8080, () => {
-    console.log('Server is running on port 8080');
-});//不用3000因为react默认端口是3000,当server.js运行时，就会触发这个箭头函数
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
