@@ -31,7 +31,7 @@ const CourseComponent = ({ currentUser, setCurrentUser }) => {
           });
       }
     }
-  }, []);
+  }, [currentUser]);
 
   return (
     <div style={{ padding: "3rem" }}>
