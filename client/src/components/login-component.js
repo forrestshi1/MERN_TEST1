@@ -2,62 +2,119 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
 
+// MUI Imports
+import {
+  Container,
+  Box,
+  Paper,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
 const LoginComponent = ({ currentUser, setCurrentUser }) => {
-  const nagivate = useNavigate();
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
-  let [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-  };
-  const handlePassword = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleLogin = async () => {
-    try {
-      let response = await AuthService.login(email, password);
-      localStorage.setItem("user", JSON.stringify(response.data));//把后端返回的 Token 存到 localStorage 里。
-      window.alert("登入成功。您現在將被重新導向到個人資料頁面。");
-      setCurrentUser(AuthService.getCurrentUser());
-      nagivate("/profile");
-    } catch (e) {
-      setMessage(e.response.data);
-    }
+  const handleLogin = () => {
+    setLoading(true);
+    setMessage("");
+    AuthService.login(email, password)
+      .then((response) => {
+        localStorage.setItem("user", JSON.stringify(response.data));
+        window.alert("登录成功。您现在将被重定向到个人资料页面。");
+        setCurrentUser(AuthService.getCurrentUser());
+        navigate("/profile");
+      })
+      .catch((e) => {
+        setMessage(e.response.data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <div style={{ padding: "3rem" }} className="col-md-12">
-      <div>
-        {message && <div className="alert alert-danger">{message}</div>}
-        <div className="form-group">
-          <label htmlFor="username">電子信箱：</label>
-          <input
-            onChange={handleEmail}
-            type="text"
-            className="form-control"
+    <Container component="main" maxWidth="xs">
+      <Paper
+        elevation={3}
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: 4,
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          会员登录
+        </Typography>
+        <Box component="form" noValidate sx={{ mt: 3 }}>
+          {message && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {message}
+            </Alert>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="电子邮箱"
             name="email"
+            autoComplete="email"
+            autoFocus
+            onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-        <br />
-        <div className="form-group">
-          <label htmlFor="password">密碼：</label>
-          <input
-            onChange={handlePassword}
-            type="password"
-            className="form-control"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             name="password"
+            label="密码"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <br />
-        <div className="form-group">
-          <button onClick={handleLogin} className="btn btn-primary btn-block">//用户点击后执行 handleLogin 登录函数。
-            <span>登入系統</span>
-          </button>
-        </div>
-      </div>
-    </div>
+          <Box sx={{ position: "relative" }}>
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              登录
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: "primary.main",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

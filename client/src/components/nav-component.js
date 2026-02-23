@@ -1,123 +1,76 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
-import "./NavComponent.css";
+
+// MUI Imports
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import SchoolIcon from "@mui/icons-material/School";
 
 const NavComponent = ({ currentUser, setCurrentUser }) => {
-  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     AuthService.logout();
-    window.alert("登出成功!現在您會被導向到首頁。");
+    window.alert("登出成功!现在您会被导向到首页。");
     setCurrentUser(null);
+    navigate("/");
   };
 
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <div className="nav-wrapper">
-      <nav className="navbar navbar-expand-lg nav-custom">
-        <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-            📚 學習系統
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <SchoolIcon sx={{ mr: 2 }} />
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            sx={{ flexGrow: 1, color: "inherit", textDecoration: "none" }}
           >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+            学习系统
+          </Typography>
 
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link
-                  className={`nav-link ${isActive("/") ? "active" : ""}`}
-                  to="/"
-                >
-                  首頁
-                </Link>
-              </li>
+          <Button color="inherit" component={Link} to="/">
+            首页
+          </Button>
 
-              {!currentUser && (
-                <>
-                  <li className="nav-item">
-                    <Link
-                      className={`nav-link ${isActive("/register") ? "active" : ""}`}
-                      to="/register"
-                    >
-                      註冊會員
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className={`nav-link ${isActive("/login") ? "active" : ""}`}
-                      to="/login"
-                    >
-                      會員登入
-                    </Link>
-                  </li>
-                </>
+          {!currentUser && (
+            <>
+              <Button color="inherit" component={Link} to="/register">
+                注册会员
+              </Button>
+              <Button color="inherit" component={Link} to="/login">
+                会员登录
+              </Button>
+            </>
+          )}
+
+          {currentUser && (
+            <>
+              <Button color="inherit" component={Link} to="/profile">
+                个人页面
+              </Button>
+              <Button color="inherit" component={Link} to="/course">
+                课程页面
+              </Button>
+              {currentUser.user.role === "instructor" && (
+                <Button color="inherit" component={Link} to="/postCourse">
+                  新增课程
+                </Button>
               )}
-              {currentUser && (
-                <>
-                  <li className="nav-item">
-                    <Link
-                      className={`nav-link ${isActive("/profile") ? "active" : ""}`}
-                      to="/profile"
-                    >
-                      個人頁面
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link
-                      className={`nav-link ${isActive("/course") ? "active" : ""}`}
-                      to="/course"
-                    >
-                      課程頁面
-                    </Link>
-                  </li>
-                  {currentUser.user.role === "instructor" && (
-                    <li className="nav-item">
-                      <Link
-                        className={`nav-link ${isActive("/postCourse") ? "active" : ""}`}
-                        to="/postCourse"
-                      >
-                        新增課程
-                      </Link>
-                    </li>
-                  )}
-                  {currentUser.user.role === "student" && (
-                    <li className="nav-item">
-                      <Link
-                        className={`nav-link ${isActive("/enroll") ? "active" : ""}`}
-                        to="/enroll"
-                      >
-                        註冊課程
-                      </Link>
-                    </li>
-                  )}
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link"
-                      to="/"
-                      onClick={handleLogout}
-                    >
-                      登出
-                    </Link>
-                  </li>
-                </>
+              {currentUser.user.role === "student" && (
+                <Button color="inherit" component={Link} to="/enroll">
+                  注册课程
+                </Button>
               )}
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </div>
+              <Button color="inherit" onClick={handleLogout}>
+                登出
+              </Button>
+            </>
+          )}
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

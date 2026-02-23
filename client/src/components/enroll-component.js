@@ -2,107 +2,172 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseService from "../services/course.service";
 
+// MUI Imports
+import {
+  Container,
+  Box,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  CircularProgress,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+
 const EnrollComponent = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
-  let [searchInput, setSearchInput] = useState("");
-  let [searchResult, setSearchResult] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const handleTakeToLogin = () => {
     navigate("/login");
   };
 
-  const handleChangeInput = (e) => {
-    setSearchInput(e.target.value);
-  };
-
   const handleSearch = () => {
+    if (!searchInput) return;
+    setLoading(true);
     CourseService.getCourseByName(searchInput)
       .then((data) => {
         setSearchResult(data.data);
       })
       .catch((e) => {
         console.log(e);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   const handleEnroll = (e) => {
-    CourseService.enroll(e.target.id)
+    CourseService.enroll(e.currentTarget.id)
       .then(() => {
-        window.alert("課程註冊成功!! 重新導向到課程頁面。");
+        window.alert("课程注册成功!! 即将重新导向到课程页面。");
         navigate("/course");
       })
       .catch((e) => {
         console.log(e);
+        window.alert(e.response.data || "注册失败，请稍后再试。");
       });
   };
 
-  return (
-    <div style={{ padding: "3rem" }}>
-      {!currentUser && (
-        <div>
-          <p>您必須先登入才能開始註冊課程。</p>
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={handleTakeToLogin}
-          >
-            回到登入頁面
-          </button>
-        </div>
-      )}
+  const renderNotLoggedIn = () => (
+    <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        您必须先登录才能开始注册课程。
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        onClick={handleTakeToLogin}
+      >
+        回到登录页面
+      </Button>
+    </Paper>
+  );
 
-      {currentUser && currentUser.user.role === "instructor" && (
-        <div>
-          <h1>只有學生才能夠註冊課程</h1>
-        </div>
-      )}
-      {currentUser && currentUser.user.role === "student" && (
-        <div className="search input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            onChange={handleChangeInput}
-          />
-          <button onClick={handleSearch} className="btn btn-primary">
-            搜尋課程
-          </button>
-        </div>
-      )}
+  const renderNotStudent = () => (
+    <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+      <Typography variant="h5">只有学生才能注册课程。</Typography>
+    </Paper>
+  );
 
-      {currentUser && searchResult && searchResult.length != 0 && (
-        <div>
-          <p>這是我們從API返回的數據:</p>
-          {searchResult.map((course) => {
-            return (
-              <div key={course._id} className="card" style={{ width: "18rem" }}>
-                <div className="card-body">
-                  <h5 className="card-title">課程名稱:{course.title}</h5>
-                  <p style={{ margin: "0.5rem 0rem" }} className="card-text">
+  const renderSearch = () => (
+    <Box sx={{ mb: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        注册课程
+      </Typography>
+      <TextField
+        fullWidth
+        label="搜索课程名称"
+        variant="outlined"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleSearch} edge="end">
+                <SearchIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </Box>
+  );
+
+  const renderSearchResult = () => (
+    <Box>
+      <Typography variant="h5" gutterBottom>
+        搜索结果
+      </Typography>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : searchResult && searchResult.length > 0 ? (
+        <Grid container spacing={4}>
+          {searchResult.map((course) => (
+            <Grid item xs={12} sm={6} md={4} key={course._id}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 3 }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    {course.title}
+                  </Typography>
+                  <Typography color="text.secondary" paragraph>
                     {course.description}
-                  </p>
-                  <p style={{ margin: "0.5rem 0rem" }}>
-                    學生人數: {course.students.length}
-                  </p>
-                  <p style={{ margin: "0.5rem 0rem" }}>
-                    課程價格: {course.price}
-                  </p>
-                  <p style={{ margin: "0.5rem 0rem" }}>
-                    講師: {course.instructor.username}
-                  </p>
-
-                  <a
-                    href="#"
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>讲师:</strong> {course.instructor.username}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>学生人数:</strong> {course.students.length}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>课程价格:</strong> ${course.price}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    variant="contained"
                     id={course._id}
-                    className="card-text btn btn-primary"
                     onClick={handleEnroll}
                   >
-                    註冊課程
-                  </a>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    注册课程
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Typography>没有找到课程。</Typography>
       )}
-    </div>
+    </Box>
+  );
+
+  return (
+    <Container component="main" maxWidth="lg" sx={{ py: 5 }}>
+      {!currentUser
+        ? renderNotLoggedIn()
+        : currentUser.user.role !== "student"
+        ? renderNotStudent()
+        : (
+          <>
+            {renderSearch()}
+            {searchResult !== null && renderSearchResult()}
+          </>
+        )}
+    </Container>
   );
 };
 

@@ -2,89 +2,156 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
 
+// MUI Imports
+import {
+  Container,
+  Box,
+  Paper,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+
 const RegisterComponent = () => {
   const navigate = useNavigate();
-  let [username, setUsername] = useState("");
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
-  let [role, setRole] = useState("");
-  let [message, setMessage] = useState("");
-
-  const handleUsername = (e) => {
-    setUsername(e.target.value);
-  };
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-  };
-  const handlePassword = (e) => {
-    setPassword(e.target.value);
-  };
-  const handleRole = (e) => {
-    setRole(e.target.value);
-  };
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student"); // Default to student
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = () => {
+    setLoading(true);
+    setMessage("");
     AuthService.register(username, email, password, role)
       .then(() => {
-        window.alert("註冊成功。您現在將被導向到登入頁面");
+        window.alert("注册成功。您现在将被导向到登录页面");
         navigate("/login");
       })
       .catch((e) => {
         setMessage(e.response.data);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   return (
-    <div style={{ padding: "3rem" }} className="col-md-12">
-      <div>
-        {message && <div className="alert alert-danger">{message}</div>}
-        <div>
-          <label htmlFor="username">用戶名稱:</label>
-          <input
-            onChange={handleUsername}
-            type="text"
-            className="form-control"
+    <Container component="main" maxWidth="xs">
+      <Paper
+        elevation={3}
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: 4,
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          注册会员
+        </Typography>
+        <Box component="form" noValidate sx={{ mt: 3 }}>
+          {message && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {message}
+            </Alert>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="用户名称"
             name="username"
+            autoComplete="username"
+            autoFocus
+            onChange={(e) => setUsername(e.target.value)}
           />
-        </div>
-        <br />
-        <div className="form-group">
-          <label htmlFor="email">電子信箱：</label>
-          <input
-            onChange={handleEmail}
-            type="text"
-            className="form-control"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="电子邮箱"
             name="email"
+            autoComplete="email"
+            onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-        <br />
-        <div className="form-group">
-          <label htmlFor="password">密碼：</label>
-          <input
-            onChange={handlePassword}
-            type="password"
-            className="form-control"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             name="password"
-            placeholder="長度至少超過6個英文或數字"
+            label="密码"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+            helperText="长度至少超过6个英文或数字"
+            onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <br />
-        <div className="form-group">
-          <label htmlFor="password">身份：</label>
-          <input
-            onChange={handleRole}
-            type="text"
-            className="form-control"
-            placeholder="只能填入student或是instructor這兩個選項其一"
-            name="role"
-          />
-        </div>
-        <br />
-        <button onClick={handleRegister} className="btn btn-primary">
-          <span>註冊會員</span>
-        </button>
-      </div>
-    </div>
+          <FormControl component="fieldset" margin="normal">
+            <FormLabel component="legend">身份</FormLabel>
+            <RadioGroup
+              row
+              aria-label="role"
+              name="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <FormControlLabel
+                value="student"
+                control={<Radio />}
+                label="学生"
+              />
+              <FormControlLabel
+                value="instructor"
+                control={<Radio />}
+                label="讲师"
+              />
+            </RadioGroup>
+          </FormControl>
+          <Box sx={{ position: "relative" }}>
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleRegister}
+              disabled={loading}
+            >
+              注册
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: "primary.main",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

@@ -2,97 +2,146 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseService from "../services/course.service";
 
+// MUI Imports
+import {
+  Container,
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+
 const PostCourseComponent = (props) => {
   let { currentUser, setCurrentUser } = props;
   let [title, setTitle] = useState("");
   let [description, setDescription] = useState("");
   let [price, setPrice] = useState(0);
   let [message, setMessage] = useState("");
+  let [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleTakeToLogin = () => {
     navigate("/login");
   };
-  const handleChangeTitle = (e) => {
-    setTitle(e.target.value);
-  };
-  const handleChangeDesciption = (e) => {
-    setDescription(e.target.value);
-  };
-  const handleChangePrice = (e) => {
-    setPrice(e.target.value);
-  };
+
   const postCourse = () => {
+    setLoading(true);
+    setMessage("");
     CourseService.post(title, description, price)
       .then(() => {
-        window.alert("新課程已創建成功");
+        window.alert("新课程已创建成功");
         navigate("/course");
       })
       .catch((error) => {
         console.log(error.response);
         setMessage(error.response.data);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
+  const renderNotLoggedIn = () => (
+    <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        在发布新课程之前，您必须先登录。
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        onClick={handleTakeToLogin}
+      >
+        回到登录页面
+      </Button>
+    </Paper>
+  );
+
+  const renderNotInstructor = () => (
+    <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+      <Typography variant="h5">只有讲师可以发布新课程。</Typography>
+    </Paper>
+  );
+
+  const renderForm = () => (
+    <Paper elevation={3} sx={{ p: 4 }}>
+      <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+        新增课程
+      </Typography>
+      {message && (
+        <Alert severity="warning" sx={{ width: "100%", mb: 2 }}>
+          {message}
+        </Alert>
+      )}
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="title"
+        label="课程标题"
+        name="title"
+        autoFocus
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        multiline
+        rows={4}
+        id="description"
+        label="内容"
+        name="description"
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        name="price"
+        label="价格"
+        type="number"
+        id="price"
+        onChange={(e) => setPrice(e.target.value)}
+      />
+      <Box sx={{ position: "relative", mt: 3 }}>
+        <Button
+          type="button"
+          fullWidth
+          variant="contained"
+          onClick={postCourse}
+          disabled={loading}
+        >
+          提交表单
+        </Button>
+        {loading && (
+          <CircularProgress
+            size={24}
+            sx={{
+              color: "primary.main",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginTop: "-12px",
+              marginLeft: "-12px",
+            }}
+          />
+        )}
+      </Box>
+    </Paper>
+  );
+
   return (
-    <div style={{ padding: "3rem" }}>
-      {!currentUser && (
-        <div>
-          <p>在發布新課程之前，您必須先登錄。</p>
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={handleTakeToLogin}
-          >
-            帶我進入登錄頁面。
-          </button>
-        </div>
-      )}
-      {currentUser && currentUser.user.role !== "instructor" && (
-        <div>
-          <p>只有講師可以發布新課程。</p>
-        </div>
-      )}
-      {currentUser && currentUser.user.role == "instructor" && (
-        <div className="form-group">
-          <label for="exampleforTitle">課程標題：</label>
-          <input
-            name="title"
-            type="text"
-            className="form-control"
-            id="exampleforTitle"
-            onChange={handleChangeTitle}
-          />
-          <br />
-          <label for="exampleforContent">內容：</label>
-          <textarea
-            className="form-control"
-            id="exampleforContent"
-            aria-describedby="emailHelp"
-            name="content"
-            onChange={handleChangeDesciption}
-          />
-          <br />
-          <label for="exampleforPrice">價格：</label>
-          <input
-            name="price"
-            type="number"
-            className="form-control"
-            id="exampleforPrice"
-            onChange={handleChangePrice}
-          />
-          <br />
-          <button className="btn btn-primary" onClick={postCourse}>
-            交出表單
-          </button>
-          <br />
-          <br />
-          {message && (
-            <div className="alert alert-warning" role="alert">
-              {message}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    <Container component="main" maxWidth="md" sx={{ py: 5 }}>
+      {!currentUser
+        ? renderNotLoggedIn()
+        : currentUser.user.role !== "instructor"
+        ? renderNotInstructor()
+        : renderForm()}
+    </Container>
   );
 };
 
